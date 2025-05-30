@@ -27,7 +27,7 @@ static void SearchAndReplace(string path, Dictionary<string, string> replacedVal
         // Replace text
         foreach (var item in replacedValues)
         {
-            var regex = new Regex(item.Key, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            var regex = new Regex(item.Key);
             // Replace the text using regex
             textContent = regex.Replace(textContent, item.Value);
         }
