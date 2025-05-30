@@ -2,9 +2,13 @@
 using DocumentFormat.OpenXml.Packaging;
 using System.Text.RegularExpressions;
 
-SearchAndReplace("file.docx", "{replacableText}", "REPLACED");
+SearchAndReplace("file.docx", new Dictionary<string, string>
+{
+    { "{replacableText}", "I'm just here to say" },
+    { "{differentReplacableText}", "world" },
+});
 
-static void SearchAndReplace(string path, string regex, string value)
+static void SearchAndReplace(string path, Dictionary<string, string> replacedValues)
 {
     var docAsArray = File.ReadAllBytes(path);
 
@@ -14,21 +18,25 @@ static void SearchAndReplace(string path, string regex, string value)
 
     using (var doc = WordprocessingDocument.Open(stream, true))
     {
-        string originalText;
+        string textContent;
         // Read the document XML
         using (var sr = new StreamReader(doc.MainDocumentPart.GetStream()))
         {
-            originalText = sr.ReadToEnd();
+            textContent = sr.ReadToEnd();
         }
 
         // Replace text
-        var regexText = new Regex(regex);
-        var newText = regexText.Replace(originalText, value);
+        foreach (var item in replacedValues)
+        {
+            var regex = new Regex(item.Key, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+            // Replace the text using regex
+            textContent = regex.Replace(textContent, item.Value);
+        }
 
         // Write the modified XML back
         using (var sw = new StreamWriter(doc.MainDocumentPart.GetStream(FileMode.Create)))
         {
-            sw.Write(newText);
+            sw.Write(textContent);
         }
 
         doc.Save();
