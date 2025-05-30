@@ -14,7 +14,6 @@ static void SearchAndReplace(string path, Dictionary<string, string> replacedVal
 
     using var stream = new MemoryStream();
     stream.Write(docAsArray, 0, docAsArray.Length);
-    stream.Position = 0;
 
     using (var doc = WordprocessingDocument.Open(stream, true))
     {
